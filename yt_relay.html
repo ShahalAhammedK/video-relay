@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<!--
+  YouTube relay for the downloaded dashboards.
+  YouTube refuses to play embedded videos on a page opened from disk (file://, "Error 153").
+  Hosting this one file on any https website (e.g. GitHub Pages) gives the player a web
+  address, so the dashboards can show it inside their video box:
+      https://<your-site>/yt_relay.html?v=<11-character video id>&shape=wide|tall
+  Then set YOUTUBE_RELAY_URL=https://<your-site>/yt_relay.html in the app's .env.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Video</title>
+<style>
+    html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+    iframe { border: 0; width: 100%; height: 100%; display: block; }
+    p { color: #ccc; font: 14px system-ui, sans-serif; text-align: center; margin-top: 40%; }
+</style>
+</head>
+<body>
+<script>
+    // Only a plain 11-character YouTube id is accepted; anything else shows a message.
+    const id = new URLSearchParams(location.search).get('v') || '';
+    if (/^[\w-]{11}$/.test(id)) {
+        const frame = document.createElement('iframe');
+        frame.src = `https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0&loop=1&playlist=${id}`;
+        frame.allow = 'autoplay; encrypted-media; fullscreen; picture-in-picture';
+        frame.allowFullscreen = true;
+        frame.referrerPolicy = 'strict-origin-when-cross-origin';
+        frame.title = 'YouTube video';
+        document.body.appendChild(frame);
+    } else {
+        document.body.innerHTML = '<p>No video selected.</p>';
+    }
+</script>
+</body>
+</html>
